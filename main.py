@@ -6,6 +6,12 @@ import boto3
 directory = sys.argv[1]
 files = os.listdir(directory)
 
+text_path = os.path.abspath(os.path.join(directory, "../")) + '/text'
+try:
+    os.mkdir(text_path)
+except:
+    print('Dir with "' + text_path + '" name is already exist')
+
 client = boto3.client(
     service_name='textract',
     region_name='us-east-1',
@@ -14,7 +20,6 @@ client = boto3.client(
 
 
 def get_text(path):
-    text_path = os.path.abspath(os.path.join(path, "../..")) + '/text'
     full_filename, file_extension = os.path.splitext(path)
     file_name = os.path.split(full_filename)[1]
 
@@ -31,11 +36,6 @@ def get_text(path):
     for block in blocks:
         if block['BlockType'] == 'LINE':
             lines.append(block['Text'])
-
-    try:
-        os.mkdir(text_path)
-    except:
-        print('Dir with "' + text_path + '" name is already exist')
 
     with open(text_path + '/' + file_name + '.txt', 'w') as f:
         for line in lines:
